@@ -20,12 +20,12 @@ def get_next_workday(day):
             return f"{next_day.month}月{next_day.day}日"
         next_day += datetime.timedelta(days=1)
 
-
 account = sys.argv[1]
 password = sys.argv[2]
 beijing_tz = pytz.timezone('Asia/Shanghai')
 today = datetime.datetime.now(beijing_tz).date()
 print(f"今天的日期是: {today}")
+print(f"操作时间: {datetime.datetime.now(beijing_tz).strftime('%H:%M:%S')}")
 result = get_next_workday(today)
 if judge_workday(today):
     print('发送邮件')
@@ -56,28 +56,19 @@ if judge_workday(today):
         temps = f.readline().split(',')
     main_email = []
     for t in temps:
-        main_email.append(Mailbox(email_address=t))
+        main_email.append(Mailbox(email_address=t.strip()))
     with open('second_email', 'r', encoding='utf-8') as f:
         temps = f.readline().split(',')
     second_email = []
     for t in temps:
-        second_email.append(Mailbox(email_address=t))
+        second_email.append(Mailbox(email_address=t.strip()))
+    with open('content', 'r', encoding='utf-8') as f:
+        mail_content = f.read().replace('result', result)
     message = Message(
         account=account,
         folder=account.sent,
         subject='【进门单】BOSS和网格通业务',
-        body=HTMLBody(f'''
-                    <html>
-                        <body>
-                            <p>您好，需要提进门单的人员如下：<br>
-                                进门事由：项目日常沟通<br>
-                                进门时间：{result}<br>
-                                BOSS：张良、王鹏、朱翔宇、周小华、孙科、王香、朱春慧<br>
-                                pulsar协查：曹鹏、王家豪、宋国栋、郭中奇<br>
-                                网格通：孙健、李凌、戴波、周科</p>
-                        </body>
-                    </html>
-                '''),
+        body=HTMLBody(mail_content),
         to_recipients=main_email,
         cc_recipients=second_email
     )

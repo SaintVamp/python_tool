@@ -15,8 +15,10 @@ jobs:
         PASSWORD: ${{ secrets.PASSWORD }}
         MAIN_EMAIL: ${{ secrets.MAIN_EMAIL }}
         SECOND_EMAIL: ${{ secrets.SECOND_EMAIL }}
+        CONTENT: ${{ secrets.CONTENT }}
       run: |
         pip install chinese_calendar exchangelib pytz
         echo "$MAIN_EMAIL" > main_email
         echo "$SECOND_EMAIL" > second_email
+        echo "$CONTENT" > content
         python3 auto_email.py "$ACCOUNT" "$PASSWORD"
