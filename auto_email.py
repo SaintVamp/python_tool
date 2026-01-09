@@ -1,33 +1,22 @@
 import datetime
 import sys
 
-import chinese_calendar
 import pytz
 from exchangelib import Credentials, Account, Configuration, DELEGATE, Message, HTMLBody, Mailbox
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
 
-
-def judge_workday(day):
-    if chinese_calendar.is_workday(day) and not chinese_calendar.is_holiday(day):
-        return True
-    return False
-
-
-def get_next_workday(day):
-    next_day = day + datetime.timedelta(days=1)
-    while True:
-        if chinese_calendar.is_workday(next_day) and not chinese_calendar.is_holiday(next_day):
-            return f"{next_day.month}月{next_day.day}日"
-        next_day += datetime.timedelta(days=1)
+import tools
 
 account = sys.argv[1]
 password = sys.argv[2]
+token = sys.argv[3]
 beijing_tz = pytz.timezone('Asia/Shanghai')
 today = datetime.datetime.now(beijing_tz).date()
 print(f"今天的日期是: {today}")
 print(f"操作时间: {datetime.datetime.now(beijing_tz).strftime('%H:%M:%S')}")
-result = get_next_workday(today)
-if judge_workday(today):
+result = tools.get_next_workday(today)
+mail_content = tools.get_mail_context(token,today).replace('result', result)
+if tools.judge_workday(today):
     print('发送邮件')
     # 忽略SSL证书验证（因为可能是自签名证书）
     BaseProtocol.HTTP_ADAPTER_CLS = NoVerifyHTTPAdapter
@@ -62,8 +51,6 @@ if judge_workday(today):
     second_email = []
     for t in temps:
         second_email.append(Mailbox(email_address=t.strip()))
-    with open('content', 'r', encoding='utf-8') as f:
-        mail_content = f.read().replace('result', result)
     message = Message(
         account=account,
         folder=account.sent,
