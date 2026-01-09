@@ -1,0 +1,26 @@
+name: auto_email
+on:
+  schedule:
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+jobs:
+  bulid:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Build And Push
+      env:
+        ACCOUNT: ${{ secrets.ACCOUNT }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+        MAIN_EMAIL: ${{ secrets.MAIN_EMAIL }}
+        SECOND_EMAIL: ${{ secrets.SECOND_EMAIL }}
+        CONTENT: ${{ secrets.CONTENT }}
+        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      run: |
+        pip install chinese_calendar exchangelib pytz
+        echo "$MAIN_EMAIL" > main_email
+        echo "$SECOND_EMAIL" > second_email
+        echo "$CONTENT" > content
+        python3 auto_email.py "$ACCOUNT" "$PASSWORD" "$NOTION_TOKEN"
