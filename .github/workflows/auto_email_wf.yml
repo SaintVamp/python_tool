@@ -1,7 +1,5 @@
 name: auto_email
 on:
-  schedule:
-    - cron: "30 8 * * *"
   workflow_dispatch:
 jobs:
   bulid:
