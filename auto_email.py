@@ -19,6 +19,8 @@ result = tools.get_next_workday(today)
 data_arr = tools.get_mail_context(token,today)
 mail_content=data_arr[0].replace('result', result)
 user_list=data_arr[1]
+attachment_path = r"来访信息导入文件模版.xlsx"
+tools.generate_excel_with_data(attachment_path, user_list)
 if tools.judge_workday(today):
     print('发送邮件')
     # 忽略SSL证书验证（因为可能是自签名证书）
