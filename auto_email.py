@@ -1,8 +1,9 @@
 import datetime
 import sys
+import os
 
 import pytz
-from exchangelib import Credentials, Account, Configuration, DELEGATE, Message, HTMLBody, Mailbox
+from exchangelib import Credentials, Account, Configuration, DELEGATE, Message, HTMLBody, Mailbox, FileAttachment
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
 
 import tools
@@ -15,7 +16,9 @@ today = datetime.datetime.now(beijing_tz).date()
 print(f"今天的日期是: {today}")
 print(f"操作时间: {datetime.datetime.now(beijing_tz).strftime('%H:%M:%S')}")
 result = tools.get_next_workday(today)
-mail_content = tools.get_mail_context(token,today).replace('result', result)
+data_arr = tools.get_mail_context(token,today)
+mail_content=data_arr[0].replace('result', result)
+user_list=data_arr[1]
 if tools.judge_workday(today):
     print('发送邮件')
     # 忽略SSL证书验证（因为可能是自签名证书）
@@ -59,4 +62,20 @@ if tools.judge_workday(today):
         to_recipients=main_email,
         cc_recipients=second_email
     )
+    
+    # 添加附件（可选）
+    # 直接指定附件文件路径
+    attachment_path = "C:\\path\\to\\your\\attachment.xlsx"  # 替换为实际的附件路径
+    
+    # 如果附件文件存在，则添加到邮件
+    if os.path.isfile(attachment_path):
+        with open(attachment_path, 'rb') as f:
+            content = f.read()
+        filename = os.path.basename(attachment_path)
+        file_attachment = FileAttachment(name=filename, content=content)
+        message.attach(file_attachment)
+        print(f"已添加附件: {filename}")
+    else:
+        print(f"警告: 附件路径不存在 {attachment_path}")
+    
     message.send()
