@@ -1,4 +1,4 @@
-name: auto_email
+name: auto_email_wf
 on:
   workflow_dispatch:
 jobs:
