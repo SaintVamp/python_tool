@@ -64,12 +64,6 @@ if tools.judge_workday(today):
         to_recipients=main_email,
         cc_recipients=second_email
     )
-    
-    # 添加附件（可选）
-    # 直接指定附件文件路径
-    attachment_path = "C:\\path\\to\\your\\attachment.xlsx"  # 替换为实际的附件路径
-    
-    # 如果附件文件存在，则添加到邮件
     if os.path.isfile(attachment_path):
         with open(attachment_path, 'rb') as f:
             content = f.read()
@@ -79,5 +73,4 @@ if tools.judge_workday(today):
         print(f"已添加附件: {filename}")
     else:
         print(f"警告: 附件路径不存在 {attachment_path}")
-    
     message.send()
